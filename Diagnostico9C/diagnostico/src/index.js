@@ -25,6 +25,82 @@ app.post('/validar-cadena', (req, res) => {
     }
 });
 
+// Array bidimensional de letras e imágenes
+const letrasConImagenes = [
+    ['A', 'https://img.icons8.com/ios/50/sign-language-a.png'],
+    ['B', 'https://img.icons8.com/ios/50/sign-language-b.png'],
+    ['C', 'https://img.icons8.com/ios/50/sign-language-c.png'],
+    ['D', 'https://img.icons8.com/ios/50/sign-language-d.png'],
+    ['E', 'https://img.icons8.com/ios/50/sign-language-e.png'],
+    ['F', 'https://img.icons8.com/ios/50/sign-language-f.png'],
+    ['G', 'https://img.icons8.com/ios/50/sign-language-g.png'],
+    ['H', 'https://img.icons8.com/ios/50/sign-language-h.png'],
+    ['I', 'https://img.icons8.com/ios/50/sign-language-i.png'],
+    ['J', 'https://img.icons8.com/ios/50/sign-language-j.png'],
+    ['K', 'https://img.icons8.com/ios/50/sign-language-k.png'],
+    ['L', 'https://img.icons8.com/ios/50/sign-language-l.png'],
+    ['M', 'https://img.icons8.com/ios/50/sign-language-m.png'],
+    ['N', 'https://img.icons8.com/ios/50/sign-language-n.png'],
+    ['O', 'https://img.icons8.com/ios/50/sign-language-o.png'],
+    ['P', 'https://img.icons8.com/ios/50/sign-language-p.png'],
+    ['Q', 'https://img.icons8.com/ios/50/sign-language-q.png'],
+    ['R', 'https://img.icons8.com/ios/50/sign-language-r.png'],
+    ['S', 'https://img.icons8.com/ios/50/sign-language-s.png'],
+    ['T', 'https://img.icons8.com/ios/50/sign-language-t.png'],
+    ['U', 'https://img.icons8.com/ios/50/sign-language-u.png'],
+    ['V', 'https://img.icons8.com/ios/50/sign-language-v.png'],
+    ['W', 'https://img.icons8.com/ios/50/sign-language-w.png'],
+    ['X', 'https://img.icons8.com/ios/50/sign-language-x.png'],
+    ['Y', 'https://img.icons8.com/ios/50/sign-language-y.png'],
+    ['Z', 'https://img.icons8.com/ios/50/sign-language-z.png'],
+  ];
+
+  // Función para buscar la imagen asociada a una letra
+const buscarImagen = (letra) => {
+    const imagen = letrasConImagenes.find(pair => pair[0] === letra.toUpperCase());
+    return imagen ? imagen[1] : null;
+  };
+
+app.post('/array-bidimensional-img', (req, res) => {
+
+    const letra = req.body.letra.toUpperCase(); // Obtener la letra en el cuerpo de la petición
+
+    const imagen = letrasConImagenes.find(pair => pair[0] === letra); //Busca la foto a partir del array bidimensional
+  
+    const tieneCaracteresEspeciales = (message) => {
+        const regex = /[!@#$%^&*(),.¿?":{}|<>/]/g; // Expresión regular 
+        return regex.test(message);
+    };
+    
+    if (imagen) {
+      res.json({ letra: imagen[0], imagen: imagen[1] });
+    } else if (tieneCaracteresEspeciales(letra)) {
+        res.status(400).json({ error: 'La cadena contiene caracteres especiales.' });
+    } else {
+      res.status(404).json({ error: 'La letra ingresada no tiene una imagen asociada.' });
+    }
+
+    const mensaje = req.body.mensaje.toUpperCase(); // Obtener el mensaje del cuerpo de la petición
+  
+    let mensajeConImagenes = '';
+  
+    // Iterar sobre cada letra en el mensaje y buscar la imagen asociada
+    for (let i = 0; i < mensaje.length; i++) {
+      const letra = mensaje[i];
+      const imagen = buscarImagen(letra);
+      if (imagen) {
+        // Si se encuentra la imagen, agregar la etiqueta de imagen al mensaje
+        mensajeConImagenes += `<img src="${imagen}" alt="sign-language-${letra}">`;
+      } else {
+        // Si no se encuentra la imagen, simplemente agregar la letra al mensaje
+        mensajeConImagenes += letra;
+      }
+    }
+  
+    res.send(mensajeConImagenes);
+})
+
+
 //Ruta principal para comprobar que se está ejecutando
 app.listen(3000, () => {
     console.log("Servicio NodeJS - Examen Diagnostico corriendo en el puerto 3000");
