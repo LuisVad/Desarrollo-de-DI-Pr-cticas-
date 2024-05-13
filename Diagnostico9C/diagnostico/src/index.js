@@ -56,48 +56,43 @@ const letrasConImagenes = [
   ];
 
   // Función para buscar la imagen asociada a una letra
+// Función para buscar la imagen asociada a una letra
 const buscarImagen = (letra) => {
-    const imagen = letrasConImagenes.find(pair => pair[0] === letra.toUpperCase());
-    return imagen ? imagen[1] : null;
-  };
+  const imagen = letrasConImagenes.find(pair => pair[0] === letra.toUpperCase());
+  return imagen ? imagen[1] : null;
+};
 
-app.post('/array-bidimensional-img', (req, res) => {
-
-    const letra = req.body.letra.toUpperCase(); // Obtener la letra en el cuerpo de la petición
-
-    const imagen = letrasConImagenes.find(pair => pair[0] === letra); //Busca la foto a partir del array bidimensional
-  
-    const tieneCaracteresEspeciales = (message) => {
+const tieneCaracteresEspeciales = (message) => {
         const regex = /[!@#$%^&*(),.¿?":{}|<>/]/g; // Expresión regular 
         return regex.test(message);
     };
-    
-    if (imagen) {
-      res.json({ letra: imagen[0], imagen: imagen[1] });
-    } else if (tieneCaracteresEspeciales(letra)) {
-        res.status(400).json({ error: 'La cadena contiene caracteres especiales.' });
-    } else {
-      res.status(404).json({ error: 'La letra ingresada no tiene una imagen asociada.' });
-    }
 
-    const mensaje = req.body.mensaje.toUpperCase(); // Obtener el mensaje del cuerpo de la petición
-  
-    let mensajeConImagenes = '';
-  
-    // Iterar sobre cada letra en el mensaje y buscar la imagen asociada
-    for (let i = 0; i < mensaje.length; i++) {
-      const letra = mensaje[i];
-      const imagen = buscarImagen(letra);
-      if (imagen) {
-        // Si se encuentra la imagen, agregar la etiqueta de imagen al mensaje
-        mensajeConImagenes += `<img src="${imagen}" alt="sign-language-${letra}">`;
-      } else {
-        // Si no se encuentra la imagen, simplemente agregar la letra al mensaje
-        mensajeConImagenes += letra;
-      }
+
+app.post('/array-bidimensional-img', (req, res) => {
+
+    const mensaje = req.body.mensaje.toUpperCase(); // Obtener el mensaje del cuerpo de la petición en Mayúsculas
+
+  // Validar si el mensaje contiene caracteres especiales
+  if (tieneCaracteresEspeciales(mensaje)) {
+    return res.status(400).json({ error: 'El mensaje contiene caracteres especiales.' });
+  }
+
+  let mensajeConImagenes = '';
+
+  // Iterar sobre cada letra en el mensaje y buscar la imagen asociada
+  for (let i = 0; i < mensaje.length; i++) {
+    const letra = mensaje[i];
+    const imagen = buscarImagen(letra);
+    if (imagen) {
+      // Si se encuentra la imagen, agregar la etiqueta de imagen al mensaje
+      mensajeConImagenes += `<img src="${imagen}" alt="${letra}">`;
+    } else {
+      // Si no se encuentra la imagen, simplemente agregar la letra al mensaje
+      mensajeConImagenes += letra;
     }
-  
-    res.send(mensajeConImagenes);
+  }
+
+  res.send(mensajeConImagenes);
 })
 
 
