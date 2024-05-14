@@ -55,7 +55,7 @@ const letrasConImagenes = [
     ['Z', 'https://img.icons8.com/ios/50/sign-language-z.png'],
   ];
 
-  // Función para buscar la imagen asociada a una letra
+
 // Función para buscar la imagen asociada a una letra
 const buscarImagen = (letra) => {
   const imagen = letrasConImagenes.find(pair => pair[0] === letra.toUpperCase());
@@ -70,29 +70,29 @@ const tieneCaracteresEspeciales = (message) => {
 
 app.post('/array-bidimensional-img', (req, res) => {
 
-    const mensaje = req.body.mensaje.toUpperCase(); // Obtener el mensaje del cuerpo de la petición en Mayúsculas
+  const mensaje = req.body.mensaje.toUpperCase(); // Obtener el mensaje del cuerpo de la petición en Mayúsculas
 
-  // Validar si el mensaje contiene caracteres especiales
-  if (tieneCaracteresEspeciales(mensaje)) {
-    return res.status(400).json({ error: 'El mensaje contiene caracteres especiales.' });
-  }
-
-  let mensajeConImagenes = '';
-
-  // Iterar sobre cada letra en el mensaje y buscar la imagen asociada
-  for (let i = 0; i < mensaje.length; i++) {
-    const letra = mensaje[i];
-    const imagen = buscarImagen(letra);
-    if (imagen) {
-      // Si se encuentra la imagen, agregar la etiqueta de imagen al mensaje
-      mensajeConImagenes += `<img src="${imagen}" alt="${letra}">`;
-    } else {
-      // Si no se encuentra la imagen, simplemente agregar la letra al mensaje
-      mensajeConImagenes += letra;
+    // Validar si el mensaje contiene caracteres especiales
+    if (tieneCaracteresEspeciales(mensaje)) {
+        return res.status(400).json({ error: 'El mensaje contiene caracteres especiales.' });
     }
-  }
 
-  res.send(mensajeConImagenes);
+    let mensajeConImagenes = [];
+
+    // Iterar sobre cada letra en el mensaje y buscar la imagen asociada
+    for (let i = 0; i < mensaje.length; i++) {
+        const letra = mensaje[i];
+        const imagen = buscarImagen(letra);
+        if (imagen) {
+            mensajeConImagenes.push({ letter: letra, url: imagen });
+        } else {
+            // Si no se encuentra la imagen, simplemente agregar la letra al mensaje
+            mensajeConImagenes.push({ letter: letra, url: null });
+        }
+    }
+
+    // Generar la respuesta en formato JSON
+    res.json(mensajeConImagenes);
 })
 
 

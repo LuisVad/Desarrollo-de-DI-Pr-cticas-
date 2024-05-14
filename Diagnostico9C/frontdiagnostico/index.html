@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Examen Diagnostico</title>
+</head>
+<body>
+    <div class="container mt-5">
+      <h1>Completa el Formulario:</h1>
+      <div class="row">
+        <div class="col-md-3">
+          <label for="letra">Letra:</label>
+          <input type="text" id="letra" class="form-control">
+          <button class="btn btn-success" onclick="validarLetra()" id="iniciar">Enviar</button>
+        </div>
+        <div class="col-md-3">
+          <label for="mensaje">Mensaje:</label>
+          <input type="text" id="mensaje" class="form-control">
+          <button class="btn btn-success" onclick="validarMensaje()" id="iniciar">Enviar</button>
+        </div>
+      </div>
+      <br>
+      <hr>
+      <br>
+      <div class="row mt-3">
+        <div class="col-md-12" id="carta">
+          
+        </div>
+      </div>
+    </div>
+</html>
+
+<script>
+
+    function validarLetra() {
+            const url = 'http://localhost:3000/validar-cadena';
+            const letra = document.getElementById('letra').value;
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ message: letra })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    if (data.error) {
+                        alert(data.error);
+                    } else {
+                        alert('La cadena no contiene caracteres especiales.');
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+    }
+
+    function validarMensaje() {
+            const url = 'http://localhost:3000/array-bidimensional-img';
+            const mensaje = document.getElementById('mensaje').value;
+            const contenedor = document.getElementById('carta');
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ mensaje: mensaje })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    let html = '<div>';
+                    for (let i = 0; i < data.length; i++) {
+                        html += '<div>';
+                        for (let j = 0; j < data[i].length; j++) {
+                            html += `<img src="${data[i][j].url}" alt="${data[i][j].letter}">`;
+                            html += `<span>${data[i][j].letter}</span>`;
+                        }
+                        html += '</div>';
+                    }
+                    html += '</div>';
+                    contenedor.innerHTML = html;
+                })
+                .catch(error => console.error('Error:', error));
+        }
+   
+</script>
