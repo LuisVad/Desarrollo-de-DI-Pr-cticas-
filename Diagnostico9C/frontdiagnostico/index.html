@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
     <title>Examen Diagnostico</title>
 </head>
 <body>
@@ -10,27 +11,29 @@
       <h1>Completa el Formulario:</h1>
       <div class="row">
         <div class="col-md-3">
-          <label for="letra">Letra:</label>
+          <label for="letra" class="form-label">Letra:</label>
           <input type="text" id="letra" class="form-control">
-          <button class="btn btn-success" onclick="validarLetra()" id="iniciar">Enviar</button>
+          <button type="button" class="btn btn-success mt-2" onclick="validarLetra()" >Enviar</button>
         </div>
         <div class="col-md-3">
-          <label for="mensaje">Mensaje:</label>
+          <label for="mensaje" class="form-label">Mensaje:</label>
           <input type="text" id="mensaje" class="form-control">
-          <button class="btn btn-success" onclick="validarMensaje()" id="iniciar">Enviar</button>
+          <button type="button" class="btn btn-success mt-2" onclick="enviarPeticion()" >Enviar</button>
         </div>
       </div>
       <br>
       <hr>
       <br>
-      <div class="row mt-3">
-        <div class="col-md-12" id="carta">
+      <div class="row mt-3" id="carta">
+        <div class="col-md-12" >
           
         </div>
       </div>
     </div>
-</html>
-
+</body>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <script>
 
     function validarLetra() {
@@ -55,32 +58,43 @@
                 .catch(error => console.error('Error:', error));
     }
 
-    function validarMensaje() {
-            const url = 'http://localhost:3000/array-bidimensional-img';
+    const enviarPeticion = () => {
             const mensaje = document.getElementById('mensaje').value;
-            const contenedor = document.getElementById('carta');
-            fetch(url, {
+
+            // Petición Fetch
+            fetch('http://localhost:3000/array-bidimensional-img', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({ mensaje: mensaje })
             })
-                .then(response => response.json())
-                .then(data => {
-                    let html = '<div>';
-                    for (let i = 0; i < data.length; i++) {
-                        html += '<div>';
-                        for (let j = 0; j < data[i].length; j++) {
-                            html += `<img src="${data[i][j].url}" alt="${data[i][j].letter}">`;
-                            html += `<span>${data[i][j].letter}</span>`;
-                        }
-                        html += '</div>';
-                    }
-                    html += '</div>';
-                    contenedor.innerHTML = html;
-                })
-                .catch(error => console.error('Error:', error));
-        }
+            .then(response => {
+                if (!response.ok) {
+                    alert('La cadena no contiene caracteres especiales.');
+                    throw new Error('Error en la petición.');
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Manejar la respuesta del servidor
+                console.log(data);
+                mostrarResultado(data);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        };
+
+        const mostrarResultado = (data) => {
+            const cartaDiv = document.getElementById('carta').querySelector('.col-md-12');
+            cartaDiv.innerHTML = ''; // Limpiar el contenido anterior
+
+            data.forEach(item => {
+                const imagen = item.url ? `<img src="${item.url}" alt="${item.letter}" class="imagen-letra">` : '';
+                cartaDiv.innerHTML += `<div class="d-flex align-items-center">${imagen}${item.letter.toUpperCase()}</div>`;
+            });
+        };
    
 </script>
+</html>
